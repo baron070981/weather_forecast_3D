@@ -14,38 +14,24 @@ import gltf
 import math
 from math import cos, sin
 
-
-import surrounding_objects as surobj
-import lights
-import position_map_proc as pmp
-
-
-loadPrcFileData('', 'win-size 1280 700')
-
-map_houses = pmp.MapPosition().read('./map.csv', 1, 1)
-
-class Landscape:
-    def __init__(self, path, position = (0,-1,0), rot=(0,0,0)):
-        
-        self.obj = loader.loadModel(path)
-        self.obj.reparentTo(render)
-        self.obj.setPos(position)
-        self.obj.setHpr(rot)
+try:
+    from . import surrounding_objects as surobj
+    from . import lights
+    from . import position_map_proc as pmp
+except:
+    import surrounding_objects as surobj
+    import lights
+    import position_map_proc as pmp
 
 
-class House:
-    def __init__(self, path, position = (0,-1,0), rot=(0,0,0)):
-        
-        self.obj = loader.loadModel(path)
-        self.obj.reparentTo(render)
-        self.obj.setPos(position)
-        self.obj.setHpr(rot)
+
+loadPrcFileData('', 'win-size 1280 700') # утсановка размера окна 1280 Х 700
+
+map_houses = pmp.MapPosition().read('./map.csv', 1, 1) # загрузка позиций для размещения домов
 
 
 class World(ShowBase):
-    cubic = './cubic.glb'
-    cubic2 = './textcube.glb'
-    huinya = './scene.gltf'
+    
     
     def __init__(self, **kwargs):
         ShowBase.__init__(self)
@@ -306,8 +292,10 @@ class World(ShowBase):
         ...
 
 
-world = World()
-world.run()
+if __name__ == '__main__':
+
+    world = World()
+    world.run()
 
 
 

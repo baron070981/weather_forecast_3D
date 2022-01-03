@@ -23,11 +23,15 @@ class ObjectData:
 
 class MapPosition:
     
+    BASE_DIR = Path(__file__).resolve().parent
+    SRC_DIR = BASE_DIR.joinpath('maps')
+    
     def __init__(self):
         pass
     
     
     def read(self, filename, obj, names:list):
+        filename = MapPosition.SRC_DIR.joinpath(filename)
         fieldnames = ['objid','s','x','y','z','h','p','r']
         objects = []
         with open(filename, newline='') as f:
