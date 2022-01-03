@@ -7,9 +7,11 @@ from pprint import pprint
 import os.path
 import time
 import json
+import rich
 
 
 import weatherdata
+import secret
 
 console = console.Console()
 
@@ -22,6 +24,8 @@ LON = 34.00
 old_time = 0
 now_time = int(time.time())
 interval = 3600
+
+DATA = None
 
 def update_time():
     ...
@@ -58,9 +62,26 @@ def save_data(filename, data:dict=None):
 
 
 def get_data(api_key, lat, lon):
-    resp = yandex.get(requests, api_key=api_key, rate='forecast', lat=lat, lon=lon)
+    resp = yandex.get(requests, api_key=api_key, rate='informers', lat=lat, lon=lon)
+    rich.print(resp)
     data = weatherdata.format_data(dict(resp['fact']))
     return data
+
+
+def get_angle_sun_at_noon(latitude):
+    winter = 66 - latitude
+    equinox = 90 - latitude
+    summer = 180 - 66 - latitude
+    return winter, equinox, summer
+
+
+def get_sun_path_lenght(lenght_day):
+    '''
+    lenght_day - int, продолжительность дня в минутах
+    '''
+    noon = int(lenght_day/2)
+    
+
 
 
 if __name__ == '__main__':
@@ -83,7 +104,7 @@ if __name__ == '__main__':
     
     
     if GETDATA:
-        tmp = get_data('962fe530-4a9f-4c35-a514-21cda42aea0e', LAT, LON)
+        tmp = get_data(secret.token, str(LAT), str(LON))
         tmp = weatherdata.update_data(tmp)
         conf = {'TIME':now_time, 'LAT':LAT, 'LON':LON, 'INTERVAL':interval}
         conf = weatherdata.update_conf(conf)

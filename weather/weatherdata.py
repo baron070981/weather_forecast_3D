@@ -2,6 +2,18 @@ import time
 import yandex_weather_api as yandex
 
 
+
+seasons = {
+    'winter':[],  # зима (с 1 декабря)
+    'spring_fh':[],  # начало весны, примерно до 25 апреля
+    'spring_sh':[],  # вторая половина весны
+    'summer':[],  # лето
+    'autumn_fh':[],  # начало осени(по середину или конец октября)
+    'autumn_sh':[],  # вторая часть осени
+}
+
+
+
 # yandex.types.Condition
 
 weather_keys = [
@@ -133,47 +145,6 @@ def format_data(datain):
             data[key] = datain[key]
     return data
 
-
-
-import numpy as np
-
-x = np.linspace(-1.0, 1.0, 50)
-y = np.random.rand(50) - 0.5
-r = np.ones(50)
-g = np.zeros(50)
-b = np.zeros(50)
-
-
-
-vertices = np.dstack([x, y, r, g, b])
-print(vertices)
-
-vert = np.array([
-        -0.3, 0.5,
-        0.3, 0.5,
-        0.5, 0.3,
-        0.5, -0.3,
-        0.3, -0.5,
-        -0.3, -0.5,
-        -0.5, -0.3,
-        -0.5, 0.3
-    ])
-
-vert = vert.reshape((8,2))
-print(vert)
-
-col = np.array([
-        [255.,255.,0.0],
-        [255.,255.,0.0],
-        [255.,255.,0.0],
-        [255.,255.,0.0],
-        [255.,255.,0.0],
-        [255.,255.,0.0],
-        [255.,255.,0.0],
-        [255.,255.,0.0],
-    ])
-print()
-print(np.concatenate((vert, col), axis=1))
 
 
 

@@ -3,7 +3,7 @@ from direct.actor.Actor import Actor
 from panda3d.core import ModelNode
 from panda3d.core import Loader
 from panda3d.core import Filename, AmbientLight, DirectionalLight
-from panda3d.core import loadPrcFileData
+from panda3d.core import loadPrcFileData, ConfigVariableManager
 from panda3d.core import KeyboardButton
 from panda3d.core import LPoint3, LVector3, TextureStage, TexGenAttrib
 from direct.filter.CommonFilters import CommonFilters
@@ -24,8 +24,11 @@ except:
     import position_map_proc as pmp
 
 
+loadPrcFileData('', "window-title Weather3D")
 
-loadPrcFileData('', 'win-size 1280 700') # утсановка размера окна 1280 Х 700
+
+def set_window_size(w=1280, h=700):
+    loadPrcFileData('', f'win-size {w} {h}') # утсановка размера окна 1280 Х 700
 
 map_houses = pmp.MapPosition().read('./map.csv', 1, 1) # загрузка позиций для размещения домов
 
@@ -293,7 +296,10 @@ class World(ShowBase):
 
 
 if __name__ == '__main__':
-
+    
+    # cvMgr = ConfigVariableManager.getGlobalPtr()
+    # print(cvMgr.listVariables())
+    
     world = World()
     world.run()
 
