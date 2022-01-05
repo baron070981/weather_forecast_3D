@@ -10,9 +10,11 @@ from direct.filter.CommonFilters import CommonFilters
 
 
 import sys
-import gltf
 import math
 from math import cos, sin
+from dataclasses import dataclass
+
+
 
 try:
     from . import surrounding_objects as surobj
@@ -28,20 +30,32 @@ loadPrcFileData('', "window-title Weather3D")
 
 
 def set_window_size(w=1280, h=700):
-    loadPrcFileData('', f'win-size {w} {h}') # утсановка размера окна 1280 Х 700
+    loadPrcFileData('', f'win-size {w} {h}') # утсановка размера окна
 
 map_houses = pmp.MapPosition().read('./map.csv', 1, 1) # загрузка позиций для размещения домов
+
+
+
+@dataclass
+class Models:
+    skybox: str = 'bigcube.glb'
+    skybox_tex: str = 'sky_#.png'
+    landscape: str = 'landscape_summer.glb'
+    house: str = 'wooden_house_sum.glb'
+    
 
 
 class World(ShowBase):
     
     
-    def __init__(self, **kwargs):
+    def __init__(self, models, **kwargs):
         ShowBase.__init__(self)
         
         self.lightcolor = (0.7, 0.7, 0.7, 1)
         self.state_color_plus = True
-        
+
+        self.models = models
+
         self.angle = 0.0 # угол поворота камеры по оси X
         self.a_y = 0.0 # угол поворота камеры по оси y
         self.a_z = 0.0 # угол поворота камеры по оси z
@@ -59,6 +73,7 @@ class World(ShowBase):
         
         self.position = (self.x, self.y, self.z) # позиция камеры
         self.cam.set_pos(self.position)
+        self.camLens.set_near_far(0.1, 2000)
         
         self.filters = CommonFilters(self.win, self.cam)
         
@@ -79,19 +94,18 @@ class World(ShowBase):
         self.todown = KeyboardButton.down()
         
         
-        # self.win.setClearColor((0.3, 0, 0, 1))
         self.set_background_color(0.0, 0.5, 0.75, 1)
         
         
         
-        self.sky = surobj.SkyBox('cubemap', 'bigcube.glb', 'sky_#.png')
+        self.sky = surobj.SkyBox('cubemap', self.models.skybox, self.models.skybox_tex)
         self.sky.obj.setScale(2.1)
         self.sky.obj.setY(0.)
         self.sky.obj.setX(0.)
         self.sky.obj.setZ(0)
         
         
-        self.land = surobj.ModelObj('landscape_summer.glb', rot=(0, 180, 0), position=(0,0,6))
+        self.land = surobj.ModelObj(self.models.landscape, rot=(0, 180, 0), position=(0,0,6))
         self.land.obj.setScale(2)
         self.land.obj.setY(0.)
         self.land.obj.setX(0.)
@@ -101,7 +115,7 @@ class World(ShowBase):
         
         houses = []
         for house in map_houses:
-            h = surobj.ModelObj('wooden_house_sum.glb')
+            h = surobj.ModelObj(self.models.house)
             h.obj.setScale(float(house.scale))
             h.obj.setY(float(house.y))
             h.obj.setX(float(house.x))
@@ -111,25 +125,13 @@ class World(ShowBase):
             h.name = house.obj_id
             houses.append(h)
         
-        # self.izba = surobj.ModelObj('wooden_house_sum.glb', rot=(0, 180, 0), position=(0,0,6))
-        # self.izba.obj.setScale(1.5)
-        # self.izba.obj.setY(120.)
-        # self.izba.obj.setX(30.)
-        # self.izba.obj.setZ(-0.8)
-        # self.izba.obj.setR(180)
-        # self.izba.obj.setH(-170)
-        
-        
-        
-        
+
         self.ambientLight = lights.TotalLight((0.5, 0.4, 0.3, 1))
         render.setLight(render.attachNewNode(self.ambientLight.obj))
         
-        
-        
+
         
         self.directlight = lights.LocalLight(color=(1,0,0,1),pos=(100, -100, 100),dirpos=(-400, 200, -3))
-        # self.directlight.add('izba', self.izba.obj)
         for house in houses:
             self.directlight.add(house.name, house.obj)
         self.directlight.add('land', self.land.obj)
@@ -144,8 +146,6 @@ class World(ShowBase):
         self.accept('b', self.move_task, [self.blue])
         self.accept('p', self.move_task, [self.color_plus])
         self.accept('m', self.move_task, [self.color_minus])
-        # self.accept('p-repeat', self.move_task, [self.forward])
-        # self.accept('m-repeat', self.move_task, [self.forward])
         
         
         self.accept("escape", sys.exit)
@@ -157,13 +157,14 @@ class World(ShowBase):
         self.accept('arrow_right-repeat', self.move_task, [self.toright])
         self.accept('arrow_up-repeat', self.move_task, [self.toup])
         self.accept('arrow_down-repeat', self.move_task, [self.todown])
-    
+
+
+    def set_models(self, **kwargs):
+        self.models.update(kwargs)
     
     
     # поворот по оси X
     def rotate(self, angle = 1):
-        # self.angle += angle
-        # self.cam.lookAt(self.angle, self.a_y, self.a_z)
         hpr = self.cam.getHpr()
         self.angle = hpr[0]+angle
         self.cam.setH(self.angle)
@@ -284,8 +285,6 @@ class World(ShowBase):
             
         if is_down(self.color_minus):
             self.ambientLight.set_flag(False)
-        
-        # self.cam.lookAt(point=LPoint3(0, 100, -10), up=(0,0,1))
     
     
     
@@ -296,14 +295,9 @@ class World(ShowBase):
 
 
 if __name__ == '__main__':
-    
-    # cvMgr = ConfigVariableManager.getGlobalPtr()
-    # print(cvMgr.listVariables())
-    
-    world = World()
+
+    world = World(Models())
     world.run()
-
-
 
 
 
