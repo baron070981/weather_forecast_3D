@@ -192,10 +192,10 @@ class Weather:
         '''
         if not os.path.isfile(Weather.data_file):
             _data = weatherdata.default_data.copy()
-            with open(filename, 'w') as f:
+            with open(self.data_file, 'w') as f:
                 json.dump(_data, f)
                 print('Создание файла config.json')
-            seld.DATASTATE = True
+            self.DATASTATE = True
     
     def load_weatherdata(self):
         data = None
