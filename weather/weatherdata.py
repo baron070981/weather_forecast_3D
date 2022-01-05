@@ -14,6 +14,8 @@ seasons = {
 
 
 
+
+
 # yandex.types.Condition
 
 weather_keys = [
